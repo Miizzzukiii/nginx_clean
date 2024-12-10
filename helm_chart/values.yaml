@@ -75,12 +75,6 @@ services:
     targetPort: 9113  
 
 
-configMaps:
-  nginx:
-    name: "nginx-config-map" 
-  exporter:
-    name: "nginx-exporter-config-map"  
-
 
 livenessProbe:
   nginx:
@@ -119,8 +113,16 @@ imagePullSecrets:
   name: 7tech-artifactory
   
 
+configMaps:
+  nginx:
+    name: "nginx-config-map" 
+  exporter:
+    name: "nginx-exporter-config-map"  
 
-
+exporter:
+  access:
+    allow:
+      - "10.5.0.0/16"
 
 
 

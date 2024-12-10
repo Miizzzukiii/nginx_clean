@@ -102,10 +102,22 @@ readinessProbe:
     initialDelaySeconds: 10  
     periodSeconds: 5  
 
+volumes:
+  nginx:
+    name: "nginx-config-volume"
+    configMapName: "nginx-config-map"
+  exporter:
+    name: "nginx-exporter-config-volume"
+    configMapName: "nginx-exporter-config-map"
+
 
 DeploymentUpdate:
   maxSurge: "1"  
   maxUnavailable: "1"  
+
+imagePullSecrets:
+  name: 7tech-artifactory
+  
 
 
 

@@ -1,9 +1,10 @@
 metadata:
-  name: "smev-proxy-deployment"
+  name: "smev-proxy"
+  environment: "devops-utils"
   labels:
     app: "smev-proxy"
     environment: "devops-utils"
-
+    developer: "7tech"
 replicaCount: 2
 
 
@@ -85,7 +86,7 @@ DeploymentUpdate:
   maxSurge: "1"  
   maxUnavailable: "1"  
 
-# Настройки livenessProbe и readinessProbe
+
 livenessProbe:
   nginx:
     path: "/smev-proxy/api/v1/status" 

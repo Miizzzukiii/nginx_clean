@@ -1,8 +1,7 @@
 variables:
-  NAMESPACE: utils
+  NAMESPACE: devops-utils
   JOB_NAME: smev-proxy
   KUBECONFIG: /etc/deploy/config
-  NAMESPACE: devops-utils
   VAULT_ADD: $CI_VAULT_ADD
   CI_PROJECT_NAME: smev-proxy
   CI_PROJECT_NAMESPACE: utils
@@ -13,18 +12,18 @@ variables:
 stages: 
 - init
 - deploy
+- clean
 
 get_vars:
   stage: init
   reports:
-    dotenv: build.env  # Сохранение переменных окружения для следующего этапа
+    dotenv: build.env  
   expire_in: 1 hour
 
 deploy_to_develop:
   stage: deploy
   variables:
     ENVIRONMENT: dev
-    CHART: cloud-dev #у Саши так было
     NAMESPACE: $NAMESPACE
     PROJECT_NAME_APP: $CI_PROJECT_NAME
     PROJECT_NAME_GROUP: $CI_PROJECT_NAMESPACE
@@ -42,8 +41,8 @@ deploy_to_develop:
 cleanup:
   stage: cleanup
   script:
-    - helm uninstall my-release --namespace my-namespace
-  when: on_failure  # Удалить деплой, если он завершился с ошибкой
+    - helm uninstall smev-proxy --namespace $NAMESPACE
+  when: on_failure  
 
 
 

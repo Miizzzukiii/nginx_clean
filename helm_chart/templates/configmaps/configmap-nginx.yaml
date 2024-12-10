@@ -7,23 +7,23 @@ metadata:
     environment: {{ .Values.metadata.environment }}
 data:
   nginx.conf: |
-    load_module modules/ngx_http_stub_status_module.so; #подключаем модуль для сбора базовых метрик
+    load_module modules/ngx_http_stub_status_module.so;
 
-    user nginx; #системный пользователь для nginx
-    worker_processes {{ .Values.nginx.workerProcesses | default "auto" }}; #автом опред кол-во процессов рабочих потоков исходя из CPU
+    user nginx;
+    worker_processes {{ .Values.nginx.workerProcesses | default "auto" }};
 
     events {
-      worker_connections {{ .Values.nginx.workerConnections | default 1024 }}; #макс кол-во соед на 1 процесс
+      worker_connections {{ .Values.nginx.workerConnections | default 1024 }};
     }
 
     http {
-      upstream external_backend { #сюда будет направлен трафик от nginx
+      upstream external_backend {
         {{- if .Values.nginx.loadBalancingAlgorithm }}
         {{ .Values.nginx.loadBalancingAlgorithm }};
         {{- else }}
-        least_conn; #допустим
+        least_conn;
         {{- end }}
-        
+
         {{- range .Values.nginx.externalServers }}
         server {{ . }};
         {{- end }}
@@ -32,30 +32,29 @@ data:
       server {
         listen {{ .Values.nginx.listenPort | default 80 }};
 
-        location / {                          # "/" - обработать все запросы
-          proxy_pass http://external_backend; #запросы, приходящие на этот сервер, перенаправляются на upstream external_backend
-          proxy_set_header Host $host; #что передает? домен
-          proxy_set_header X-Real-IP $remote_addr;   #IP
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  #цепочку IP через кот прошел запрос
-          proxy_set_header X-Forwarded-Proto $scheme; #протокол, кот исп клиент 
+        location / {
+          proxy_pass http://external_backend;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
         }
-      }
-        location {{ .Values.livenessProbe.nginx.path }} { # location для проверки доступности для liveness readiness 1
-          access_log off; # отключаем логи запросов
-          return 200 'OK'; # возвращаем 200 OK
-          add_header Content-Type text/plain; # добавляем заголовок Content-Type
+
+        location {{ .Values.livenessProbe.nginx.path }} {
+          access_log off;
+          return 200 'OK';
+          add_header Content-Type text/plain;
         }
       }
 
       server {
         listen {{ .Values.nginx.statusPort | default 8080 }};
-        location /nginx_status {   #мониторинг с помощью модуля
-          stub_status; #активация модуля
-          {{- if .Values.nginx.statusAccess.allow }} 
-          allow {{ .Values.nginx.statusAccess.allow }}; # разрешает доступ определенным IP/подсетям
+        location /nginx_status {
+          stub_status;
+          {{- if .Values.nginx.statusAccess.allow }}
+          allow {{ .Values.nginx.statusAccess.allow }};
           {{- end }}
-          deny all; #запрещает доступ всем остальным
+          deny all;
         }
       }
     }
-

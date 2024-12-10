@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configMaps.exporter.name }}
+  labels:
+    app: {{ .Values.metadata.labels.app }}
+    environment: {{ .Values.metadata.environment }}
+data:
+  exporter.conf: |
+    scrape_interval: {{ .Values.exporter.scrapeInterval | default "15s" }};
+    status_url: {{ .Values.exporter.statusUrl | default "http://localhost:8080/nginx_status" }}; #отсюда будет забирать метрики
+
+    # Ограничение доступа к метрикам экспортера
+    allow_ips: |
+      {{- if .Values.exporter.access.allow }}
+      {{ .Values.exporter.access.allow }}
+      {{- else }}
+      0.0.0.0/0 # Разрешить всем, если не указано значение
+      {{- end }}

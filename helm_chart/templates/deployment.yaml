@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.metadata.name }}
+  environment: {{ .Values.metadata.environment }}
+  labels:
+    app: {{ .Values.metadata.labels.app }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    developer: {{ .Values.metadata.labels.developer }}
+    environment: {{ .Values.metadata.environment }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels: 
+      app: {{ .Values.metadata.labels.app }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.metadata.labels.app }}
+        environment: {{ .Values.metadata.environment }}
+    spec:
+      containers:
+        - name: nginx
+          image: "{{ .Values.nginx.image.repository }}:{{ .Values.nginx.image.tag }}"
+          imagePullPolicy: {{ .Values.nginx.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.nginx.port | default 80 }}
+          volumeMounts:
+            - name: {{ .Values.nginx.config.volumeName }}
+              mountPath: {{ .Values.nginx.config.mountPath }}
+              subPath: {{ .Values.nginx.config.subPath }}
+          livenessProbe: 
+            httpGet:
+              path: {{ .Values.nginx.livenessProbe.path }}
+              port: {{ .Values.nginx.port }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          readinessProbe: 
+            httpGet:
+              path: {{ .Values.nginx.readinessProbe.path }}
+              port: {{ .Values.nginx.port }}
+            initialDelaySeconds: {{ .Values.readinessProbe.nginx.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.nginx.periodSeconds }}
+          resources: 
+            limits:
+              cpu: {{ .Values.nginx.resources.limits.cpu }}
+              memory: {{ .Values.nginx.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.nginx.resources.requests.cpu }}
+              memory: {{ .Values.nginx.resources.requests.memory }}
+        - name: nginx-exporter
+          image: "{{ .Values.exporter.image.repository }}:{{ .Values.exporter.image.tag }}"
+          imagePullPolicy: {{ .Values.exporter.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.exporter.port }}
+          volumeMounts:
+            - name: {{ .Values.exporter.config.volumeName }}
+              mountPath: {{ .Values.exporter.config.mountPath }}
+              subPath: {{ .Values.exporter.config.subPath }}
+          livenessProbe: 
+            httpGet:
+              path: {{ .Values.exporter.livenessProbe.path }}
+              port: {{ .Values.exporter.port }}
+            initialDelaySeconds: {{ .Values.exporter.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.exporter.livenessProbe.periodSeconds }}
+          readinessProbe: 
+            httpGet:
+              path: {{ .Values.exporter.readinessProbe.path }}
+              port: {{ .Values.exporter.port }}
+            initialDelaySeconds: {{ .Values.exporter.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.exporter.readinessProbe.periodSeconds }}
+          resources: 
+            limits:
+              cpu: {{ .Values.exporter.resources.limits.cpu }}
+              memory: {{ .Values.exporter.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.exporter.resources.requests.cpu }}
+              memory: {{ .Values.exporter.resources.requests.memory }}
+      volumes:
+        - name: {{ .Values.nginx.config.volumeName }}
+          configMap:
+            name: {{ .Values.nginx.config.configMapName }}
+        - name: {{ .Values.exporter.config.volumeName }}
+          configMap:
+            name: {{ .Values.exporter.config.configMapName }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.DeploymentUpdate.maxSurge }} #кол-во доп подов кот можно поднять при обновлении (сверх указ кол-ва реплик)- числа или %
+      maxUnavailable: {{ .Values.DeploymentUpdate.maxUnavailable }} #кол-во подов кот могут быть недоступны во время обновления относительно изначального кол-ва реплик 
+ imagePullSecrets:
+        - name: {{ .Values.imagePullSecrets.name }}

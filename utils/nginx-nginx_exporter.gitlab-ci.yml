@@ -1,0 +1,49 @@
+variables:
+  NAMESPACE: utils
+  JOB_NAME: smev-proxy
+  KUBECONFIG: /etc/deploy/config
+  NAMESPACE: devops-utils
+  VAULT_ADD: $CI_VAULT_ADD
+  CI_PROJECT_NAME: smev-proxy
+  CI_PROJECT_NAMESPACE: utils
+  CI_ARTIFACTORY_URL_CLOUD: $CI_ARTIFACTORY_URL_CLOUD
+  CI_ARTIFACTORY_USER: $CI_ARTIFACTORY_USER
+  CI_ARTIFACTORY_PASSWORD: $CI_ARTIFACTORY_PASSWORD
+  
+stages: 
+- init
+- deploy
+
+get_vars:
+  stage: init
+  reports:
+    dotenv: build.env  # Сохранение переменных окружения для следующего этапа
+  expire_in: 1 hour
+
+deploy_to_develop:
+  stage: deploy
+  variables:
+    ENVIRONMENT: dev
+    CHART: cloud-dev #у Саши так было
+    NAMESPACE: $NAMESPACE
+    PROJECT_NAME_APP: $CI_PROJECT_NAME
+    PROJECT_NAME_GROUP: $CI_PROJECT_NAMESPACE
+    PROJECT_NAME_ID: $CI_PROJECT_ID
+    PROJECT_NAMESPACE_ID: $CI_PROJECT_NAMESPACE_ID
+    PROJECT_NAME_BRANCH: $CI_COMMIT_BRANCH
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop" || $CI_MERGE_REQUEST_TARGET_BRANCH == "develop"' 
+    - when: manual
+  trigger:
+    project: devops/ci-cd/deploy
+    branch: develop
+    strategy: depend
+
+cleanup:
+  stage: cleanup
+  script:
+    - helm uninstall my-release --namespace my-namespace
+  when: on_failure  # Удалить деплой, если он завершился с ошибкой
+
+
+

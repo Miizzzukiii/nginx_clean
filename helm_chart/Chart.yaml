@@ -1,0 +1,8 @@
+apiVersion: v2
+description: Helm Chart для Nginx + Nginx Prometheus Exporter
+name: smev-proxy
+version: 0.1.0 
+appVersion: "1.26.2" 
+
+
+

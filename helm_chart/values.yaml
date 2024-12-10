@@ -62,19 +62,6 @@ exporter:
     configMapName: "nginx-exporter-config-map" 
 
 
-services:
-  nginx:
-    name: "nginx-service" 
-    type: "ClusterIP"  
-    port: 8080  
-    targetPort: 8080  
-  exporter:
-    name: "nginx-exporter-service"  
-    type: "ClusterIP"  
-    port: 8081 
-    targetPort: 9113  
-
-
 
 livenessProbe:
   nginx:
@@ -117,12 +104,19 @@ configMaps:
   nginx:
     name: "nginx-config-map" 
   exporter:
-    name: "nginx-exporter-config-map"  
+    name: "nginx-exporter-config-map"
 
-exporter:
-  access:
-    allow:
-      - "10.5.0.0/16"
+services:
+  nginx:
+    name: "nginx-service" 
+    type: "ClusterIP"  
+    port: 8080  
+    targetPort: 8080  
+  exporter:
+    name: "nginx-exporter-service"  
+    type: "ClusterIP"  
+    port: 8081 
+    targetPort: 9113  
 
 
 

@@ -3,7 +3,7 @@ metadata:
   name: "smev-proxy-deployment"
   labels:
     app: "smev-proxy"
-    environment: "smev-proxy или все-таки devops-utils ? "
+    environment: "devops-utils"
 
 replicaCount: 2
 

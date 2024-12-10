@@ -7,10 +7,10 @@ metadata:
     environment: {{ .Values.metadata.environment }}
 spec:
   selector:
-    app: {{ .Values.metadata.labels.app }} # селектор для подов с экспортером
+    app: {{ .Values.metadata.labels.app }} 
   ports:
     - protocol: TCP
-      port: {{ .Values.exporter.port }}         # порт для обращения к экспортеру
-      targetPort: {{ .Values.exporter.port }}  # порт, который слушает экспортер внутри пода
+      port: {{ .Values.exporter.port }}         
+      targetPort: {{ .Values.exporter.port }}  
   type: ClusterIP  
 

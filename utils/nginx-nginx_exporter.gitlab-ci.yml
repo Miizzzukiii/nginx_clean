@@ -12,7 +12,7 @@ variables:
 stages: 
 - init
 - deploy
-- clean
+- cleanup
 
 get_vars:
   stage: init

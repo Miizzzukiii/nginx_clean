@@ -8,12 +8,14 @@ metadata:
 data:
   exporter.conf: |
     scrape_interval: {{ .Values.exporter.scrapeInterval | default "15s" }};
-    status_url: {{ .Values.exporter.statusUrl | default "http://localhost:8080/nginx_status" }}; #отсюда будет забирать метрики
+    status_url: {{ .Values.exporter.statusUrl | default "http://localhost:8080/nginx_status" }}; 
 
-    # Ограничение доступа к метрикам экспортера
-    allow_ips: |
-      {{- if .Values.exporter.access.allow }}
-      {{ .Values.exporter.access.allow }}
-      {{- else }}
-      0.0.0.0/0 # Разрешить всем, если не указано значение
-      {{- end }}
+   
+allow_ips: |
+       {{- if .Values.exporter.access.allow }}
+       {{- range .Values.exporter.access.allow }}
+       allow {{ . }};
+       {{- end }}
+       {{- else }}
+       deny all;
+       {{- end }}

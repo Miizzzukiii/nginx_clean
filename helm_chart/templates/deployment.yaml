@@ -5,7 +5,6 @@ metadata:
   environment: {{ .Values.metadata.environment }}
   labels:
     app: {{ .Values.metadata.labels.app }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     developer: {{ .Values.metadata.labels.developer }}
     environment: {{ .Values.metadata.environment }}
 spec:
@@ -86,7 +85,8 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: {{ .Values.DeploymentUpdate.maxSurge }} #кол-во доп подов кот можно поднять при обновлении (сверх указ кол-ва реплик)- числа или %
-      maxUnavailable: {{ .Values.DeploymentUpdate.maxUnavailable }} #кол-во подов кот могут быть недоступны во время обновления относительно изначального кол-ва реплик 
+      maxSurge: {{ .Values.DeploymentUpdate.maxSurge }} 
+      maxUnavailable: {{ .Values.DeploymentUpdate.maxUnavailable }} 
+
  imagePullSecrets:
-        - name: {{ .Values.imagePullSecrets.name }}
+    - name: {{ .Values.imagePullSecrets.name }}

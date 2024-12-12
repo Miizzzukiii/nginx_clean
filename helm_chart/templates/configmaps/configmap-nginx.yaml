@@ -7,7 +7,6 @@ metadata:
     environment: {{ .Values.metadata.environment }}
 data:
   nginx.conf: |
-
     user nginx;
     worker_processes {{ .Values.nginx.workerProcesses | default "auto" }};
 
@@ -57,4 +56,3 @@ data:
         }
       }
     }
-

@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Values.serviceMonitor.name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Values.metadata.labels.app }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.services.exporter.name }}  # Используем имя сервиса экспортера
+  endpoints:
+    - port: {{ .Values.services.exporter.port | default "9113" }}  # Порт сервиса экспортера
+      interval: {{ .Values.serviceMonitor.scrapeInterval | default "15s" }}  
+      path: {{ .Values.services.exporter.metricsPath | default "/metrics" }}  # Путь для метрик
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }} 
+

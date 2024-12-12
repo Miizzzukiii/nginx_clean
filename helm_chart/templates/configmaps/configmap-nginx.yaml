@@ -15,23 +15,12 @@ data:
     }
 
     http {
-      upstream external_backend {
-        {{- if .Values.nginx.loadBalancingAlgorithm }}
-        {{ .Values.nginx.loadBalancingAlgorithm }};
-        {{- else }}
-        least_conn;
-        {{- end }}
-
-        {{- range .Values.nginx.externalServers }}
-        server {{ . }};
-        {{- end }}
-      }
 
       server {
         listen {{ .Values.nginx.listenPort | default 80 }};
 
         location / {
-          proxy_pass http://external_backend;
+          proxy_pass {{ .Values.nginx.smevUrl }};
           proxy_set_header Host $host;
           proxy_set_header X-Real-IP $remote_addr;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -56,3 +45,5 @@ data:
         }
       }
     }
+
+
